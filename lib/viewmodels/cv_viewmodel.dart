@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/services/export_service.dart';
 import '../data/models/cv_model.dart';
 import '../data/repositories/cv_repository.dart';
+import '../presentation/models/template_profile.dart';
 
 class CVViewModel extends GetxController {
-  CVViewModel(this._repository);
+  CVViewModel(this._repository, this._exportService);
 
   final CVRepository _repository;
+  final ExportService _exportService;
 
   final cv = CVModel.empty().obs;
   final isLoading = false.obs;
+  final isExporting = false.obs;
+  final previewKey = GlobalKey();
 
   final fullNameController = TextEditingController();
   final jobTitleController = TextEditingController();
@@ -21,7 +26,14 @@ class CVViewModel extends GetxController {
   final experienceController = TextEditingController();
   final skillsController = TextEditingController();
 
-  final templates = List<int>.generate(10, (index) => index + 1);
+  final templates = templateProfiles;
+
+  TemplateProfile get selectedTemplate {
+    return templates.firstWhere(
+      (element) => element.id == cv.value.templateId,
+      orElse: () => templates.first,
+    );
+  }
 
   @override
   void onInit() {
@@ -67,6 +79,37 @@ class CVViewModel extends GetxController {
 
     final id = await _repository.saveCV(updated);
     cv.value = updated.copyWith(id: id);
+  }
+
+  Future<void> exportToPng() async {
+    await _runExport(() async {
+      final file = await _exportService.exportPng(previewKey, fileName: _fileName('png'));
+      Get.snackbar('PNG Exported', file.path, snackPosition: SnackPosition.BOTTOM);
+    });
+  }
+
+  Future<void> exportToPdf() async {
+    await _runExport(() async {
+      final file = await _exportService.exportPdf(previewKey, fileName: _fileName('pdf'));
+      Get.snackbar('PDF Exported', file.path, snackPosition: SnackPosition.BOTTOM);
+    });
+  }
+
+  Future<void> _runExport(Future<void> Function() action) async {
+    try {
+      isExporting.value = true;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await action();
+    } catch (error) {
+      Get.snackbar('Export failed', '$error', snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isExporting.value = false;
+    }
+  }
+
+  String _fileName(String type) {
+    final stamp = DateTime.now().millisecondsSinceEpoch;
+    return 'cv_template_${cv.value.templateId}_${stamp}_$type';
   }
 
   @override

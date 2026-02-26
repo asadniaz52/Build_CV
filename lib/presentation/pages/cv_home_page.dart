@@ -41,7 +41,7 @@ class CVHomePage extends GetView<CVViewModel> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
-              const Text('Your CV is saved locally in SQLite.'),
+              const Text('A4-ready templates. Export to PDF and PNG.'),
               const SizedBox(height: 16),
               Expanded(
                 child: GridView.builder(
@@ -53,11 +53,11 @@ class CVHomePage extends GetView<CVViewModel> {
                     childAspectRatio: 0.95,
                   ),
                   itemBuilder: (_, index) {
-                    final templateId = controller.templates[index];
+                    final template = controller.templates[index];
                     return TemplateCard(
-                      templateId: templateId,
-                      isSelected: controller.cv.value.templateId == templateId,
-                      onTap: () => controller.selectTemplate(templateId),
+                      template: template,
+                      isSelected: controller.cv.value.templateId == template.id,
+                      onTap: () => controller.selectTemplate(template.id),
                     );
                   },
                 ),

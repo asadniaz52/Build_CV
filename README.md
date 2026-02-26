@@ -9,8 +9,9 @@ A Flutter CV builder application using:
 ## Features
 
 - Create and edit CV information
-- Select from **10 CV templates**
-- Preview selected template with your data
+- Select from **10 CV templates** (including classic blue style)
+- A4 preview layout
+- Export CV as **PDF** and **PNG**
 - Save and load CV locally from SQLite
 
 ## Structure
@@ -18,7 +19,7 @@ A Flutter CV builder application using:
 - `lib/data` → models and repositories
 - `lib/viewmodels` → MVVM viewmodels (GetX controllers)
 - `lib/presentation` → pages and UI widgets
-- `lib/core` → app binding, routing, theme, and database setup
+- `lib/core` → app binding, routing, theme, database setup, export service
 
 ## Run
 
